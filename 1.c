@@ -130,10 +130,7 @@ int main(void) {
                 letters[cnt_uniq++] = 'A' + i;
             }
         }
-        if (cnt_uniq > 10) {
-            printf("net resheniy");
-            continue;
-        }
+      
         memset(begin_zero, 0, sizeof begin_zero);
         for (int i = 0; i < cnt_words; i++) {
             if (word_len[i] > 1) {
@@ -142,6 +139,21 @@ int main(void) {
         }
         if (result_len > 1)
             begin_zero[result[0] - 'A'] = 1;
+        for (int i = 0; i < cnt_uniq - 1; i++) {
+            for (int j = i + 1; j < cnt_uniq; j++) {
+                int pr_1 = 100 * begin_zero[letters[i] - 'A'] + alphavit[letters[i] - 'A'];
+                int pr_2 = 100 * begin_zero[letters[j] - 'A'] + alphavit[letters[j] - 'A'];
+                if (pr_2 > pr_1) {
+                    char t = letters[i];
+                    letters[i] = letters[j];
+                    letters[j] = t;
+                }
+            }
+        }
+        if (cnt_uniq > 10) {
+            printf("net resheniy");
+            continue;
+        }   
         memset(value, -1, sizeof value);
         memset(used, 0, sizeof used);
         clock_t start = clock();
