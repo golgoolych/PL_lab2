@@ -12,6 +12,8 @@ int cnt_uniq;
 int value[26];
 int word_len[7];
 int result_len;
+int used[10];
+int begin_zero[26];
 int parse(char* line) {
     strcpy(buf, line);
     buf[strcspn(buf, "\n")] = '\0';
@@ -48,6 +50,7 @@ void print_solution(void) {
 }
 bool check() {
 //dubl
+/*
     int for_check[10] = { 0 };
     for (int i = 0; i < cnt_uniq; i++) {
         int d = value[letters[i] - 'A'];
@@ -56,6 +59,7 @@ bool check() {
         }
         for_check[d] = 1;
     }
+
     // 0 ved
     for (int i = 0; i < cnt_words; i++) {
         if (word_len[i] > 1 && value[words[i][0] - 'A'] == 0) {
@@ -65,6 +69,7 @@ bool check() {
     if (result_len > 1 && value[result[0] - 'A'] == 0) {
         return false;
     }
+*/
     //check znach
     int val_left = 0;
     for (int i = 0; i < cnt_words; i++) {
@@ -85,9 +90,13 @@ int solve(int index) {
     }
     int c = letters[index];
     for (int i = 0; i < 10; i++) {
+        if (used[i]) continue;
+        if (i == 0 && begin_zero[c - 'A']) continue;
+        used[i] = 1;
         value[c - 'A'] = i;
         if (solve(index + 1)) return 1;
         value[c - 'A'] = -1;
+        used[i] = 0;
     }
     return 0;
 
@@ -125,7 +134,16 @@ int main(void) {
             printf("net resheniy");
             continue;
         }
+        memset(begin_zero, 0, sizeof begin_zero);
+        for (int i = 0; i < cnt_words; i++) {
+            if (word_len[i] > 1) {
+                begin_zero[words[i][0] - 'A'] = 1;
+            }
+        }
+        if (result_len > 1)
+            begin_zero[result[0] - 'A'] = 1;
         memset(value, -1, sizeof value);
+        memset(used, 0, sizeof used);
         clock_t start = clock();
         solve(0);
         clock_t end = clock();
