@@ -10,6 +10,8 @@ char buf[512];
 char letters[10];
 int cnt_uniq;
 int value[26];
+int word_len[7];
+int result_len;
 int parse(char* line) {
     strcpy(buf, line);
     buf[strcspn(buf, "\n")] = '\0';
@@ -25,11 +27,14 @@ int parse(char* line) {
         words[cnt_words++] = element;
         element = strtok(NULL, " + ");
     }
+    for (int i = 0; i < cnt_words; i++)
+        word_len[i] = strlen(words[i]);
+    result_len = strlen(result);
     return 0;
 }
 int word_value(char* word) {
     int val = 0;
-    for (int i = 0; i < strlen(word); i++) {
+    for (int i = 0; word[i] != '\0'; i++) {
         val = val * 10 + value[word[i] - 'A'];
     }
     return val;
@@ -53,11 +58,11 @@ bool check() {
     }
     // 0 ved
     for (int i = 0; i < cnt_words; i++) {
-        if (strlen(words[i]) > 1 && value[words[i][0] - 'A'] == 0) {
+        if (word_len[i] > 1 && value[words[i][0] - 'A'] == 0) {
             return false;
         }
     }
-    if (strlen(result) > 1 && value[result[0] - 'A'] == 0) {
+    if (result_len > 1 && value[result[0] - 'A'] == 0) {
         return false;
     }
     //check znach
