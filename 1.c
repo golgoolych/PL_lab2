@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include <time.h>
 char* words[7];
 int cnt_words;
 char* result;
@@ -10,8 +10,8 @@ char buf[512];
 char letters[10];
 int cnt_uniq;
 int value[26];
-int parse(void) {
-    if (!fgets(buf, sizeof buf, stdin)) return 1;
+int parse(char* line) {
+    strcpy(buf, line);
     buf[strcspn(buf, "\n")] = '\0';
 
     char* p = strchr(buf, '=');
@@ -70,44 +70,63 @@ bool check() {
     }
     return true;
 }
-void solve(int index) {
+int solve(int index) {
     if (index == cnt_uniq) {
         if (check()) {
             print_solution();
-            exit(0);
+            return 1;
         }
-        return;
+        return 0;
     }
     int c = letters[index];
     for (int i = 0; i < 10; i++) {
         value[c - 'A'] = i;
-        solve(index + 1);
+        if (solve(index + 1)) return 1;
         value[c - 'A'] = -1;
     }
+    return 0;
 
 }
 int main(void) {
-    if (parse()) return 1;
-    int alphavit[26] = { 0 };
-    for (int i = 0; i < cnt_words; i++) {
-        for (int j = 0; words[i][j] != '\0'; j++) {
-            alphavit[words[i][j] - 'A'] += 1;
-        }
-    }
-    for (int j = 0; result[j] != '\0'; j++) {
-        alphavit[result[j] - 'A'] += 1;
-    }
-    for (int i = 0; i < 26; i++) {
-        if (alphavit[i] != 0) {
-            letters[cnt_uniq++] = 'A' + i;
-        }
-    }
-    if (cnt_uniq > 10) {
-        printf("net resheniy");
+    FILE* f = fopen("tests.txt", "r");
+    if (!f) {
+        printf("file error");
         return 1;
     }
-    memset(value, -1, sizeof value);
-    solve(0);
+    char line[512];
+    while (fgets(line, sizeof line, f)) {
+        line[strcspn(line, "\n")] = '\0';
+        if (line[0] == '\0') continue;
 
+        printf("%s\n", line);
+
+        if (parse(line)) continue;
+        int alphavit[26] = { 0 };
+        cnt_uniq = 0;
+        for (int i = 0; i < cnt_words; i++) {
+            for (int j = 0; words[i][j] != '\0'; j++) {
+                alphavit[words[i][j] - 'A'] += 1;
+            }
+        }
+        for (int j = 0; result[j] != '\0'; j++) {
+            alphavit[result[j] - 'A'] += 1;
+        }
+        for (int i = 0; i < 26; i++) {
+            if (alphavit[i] != 0) {
+                letters[cnt_uniq++] = 'A' + i;
+            }
+        }
+        if (cnt_uniq > 10) {
+            printf("net resheniy");
+            continue;
+        }
+        memset(value, -1, sizeof value);
+        clock_t start = clock();
+        solve(0);
+        clock_t end = clock();
+        double seconds = (double)(end - start) / CLOCKS_PER_SEC;
+        printf("work time: %f\n", seconds);
+    }
+    fclose(f);
     return 0;
 }

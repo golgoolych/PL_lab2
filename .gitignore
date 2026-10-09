@@ -2,6 +2,10 @@
 *.obj
 *.pdb
 *.ilk
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
 .vs/
 Debug/
 Release/
